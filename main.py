@@ -8,9 +8,6 @@ from dotenv import load_dotenv
 # 環境変数
 # -----------------------------
 load_dotenv()
-SF_USERNAME = os.getenv("SF_USERNAME")
-SF_PASSWORD = os.getenv("SF_PASSWORD")
-SF_SECURITY_TOKEN = os.getenv("SF_SECURITY_TOKEN")
 
 # -----------------------------
 # Flask アプリ
