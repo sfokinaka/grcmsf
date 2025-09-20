@@ -5,28 +5,26 @@ from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 
 # -----------------------------
-# 環境変数
-# -----------------------------
-load_dotenv()
-
-# -----------------------------
 # Flask アプリ
 # -----------------------------
 app = Flask(__name__)
-app.secret_key = "super-secret-key"
+app.secret_key = os.getenv("SECRET_KEY", "super-secret-key")
 
 JST = timezone(timedelta(hours=9))
 
 # -----------------------------
 # Salesforce 接続
 # -----------------------------
+SF_USERNAME = os.getenv("SF_USERNAME")
+SF_PASSWORD = os.getenv("SF_PASSWORD")
+SF_SECURITY_TOKEN = os.getenv("SF_SECURITY_TOKEN")
+
 sf = Salesforce(
     username=SF_USERNAME,
     password=SF_PASSWORD,
     security_token=SF_SECURITY_TOKEN,
     domain="login"
 )
-
 # -----------------------------
 # ログインチェック関数
 # -----------------------------
