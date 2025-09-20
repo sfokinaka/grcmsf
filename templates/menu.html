@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>メニュー</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .menu-container {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 360px;
+    }
+
+    h2 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #555;
+      margin: 10px 0;
+    }
+
+    /* ボタン風リンク */
+    .menu-button {
+      display: block;
+      margin: 15px auto;
+      padding: 12px 20px;
+      width: 80%;
+      text-decoration: none;
+      background-color: #7aa0f8;
+      color: white;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    .menu-button:hover {
+      background-color: #5f86e0;
+    }
+
+    .logout-button {
+      display: block;
+      margin: 30px auto 0 auto;
+      padding: 10px 15px;
+      width: 50%;
+      text-decoration: none;
+      background-color: #d9534f;
+      color: white;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: 0.3s;
+    }
+
+    .logout-button:hover {
+      background-color: #c12e2a;
+    }
+  </style>
+</head>
+<body>
+  <div class="menu-container">
+    <h2>ようこそ {{ username }} さん</h2>
+    <p>所属販社: {{ company }}</p>
+
+    <a href="{{ url_for('products') }}" class="menu-button">取次可能商材一覧</a>
+    <a href="{{ url_for('new_account') }}" class="menu-button">取引先登録フォーム</a>
+    <a href="{{ url_for('logout') }}" class="logout-button">ログアウト</a>
+  </div>
+</body>
+</html>

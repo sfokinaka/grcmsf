@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>取引先登録結果</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    header span {
+      font-weight: bold;
+      color: #333;
+    }
+
+    nav a {
+      margin-left: 10px;
+      text-decoration: none;
+      color: #7aa0f8;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      color: #5f86e0;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .success {
+      color: green;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .error {
+      color: red;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    p.record {
+      text-align: center;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+
+    .menu-link {
+      display: block;
+      text-align: center;
+      margin-top: 25px;
+      color: #7aa0f8;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .menu-link:hover {
+      color: #5f86e0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <span>ログイン中: {{ user.name }}</span>
+      <nav>
+        <a href="{{ url_for('menu') }}">メニュー</a>
+        <a href="{{ url_for('new_account') }}">取引先登録</a>
+        <a href="{{ url_for('products') }}">取次可能商材</a>
+        <a href="{{ url_for('logout') }}">ログアウト</a>
+      </nav>
+    </header>
+
+    <h2>取引先登録結果</h2>
+
+    {% if success %}
+      <p class="success">{{ message }}</p>
+    {% else %}
+      <p class="error">{{ message }}</p>
+    {% endif %}
+
+    <p class="record">取引先名: {{ record_name }}</p>
+
+    <a href="{{ url_for('menu') }}" class="menu-link">メニューへ戻る</a>
+  </div>
+</body>
+</html>

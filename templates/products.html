@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>取次可能商材</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 700px;
+    }
+
+    h2 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #7aa0f8;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    a.menu-button {
+      display: block;
+      text-align: center;
+      margin: 0 auto;
+      padding: 12px 20px;
+      width: 50%;
+      background-color: #7aa0f8;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    a.menu-button:hover {
+      background-color: #5f86e0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>{{ company }} が取り扱える商材一覧</h2>
+    <table>
+      <tr>
+        <th>商材管理名</th>
+        <th>商材</th>
+        <th>商流</th>
+      </tr>
+      {% for p in products %}
+      <tr>
+        <td>{{ p["Name"] }}</td>
+        <td>{{ p["Field1__c"] }}</td>
+        <td>{{ p["Field2__c"] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    <a href="{{ url_for('menu') }}" class="menu-button">メニューへ戻る</a>
+  </div>
+</body>
+</html>

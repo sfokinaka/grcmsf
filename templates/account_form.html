@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>取引先登録</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 800px;
+    }
+
+    h2 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    fieldset {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    legend {
+      font-weight: bold;
+      padding: 0 10px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 8px 10px;
+      margin-top: 4px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      min-height: 60px;
+      resize: vertical;
+    }
+
+    .flex-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .flex-row label {
+      flex: 1;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background-color: #7aa0f8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #5f86e0;
+    }
+
+    a.menu-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #7aa0f8;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    a.menu-link:hover {
+      color: #5f86e0;
+    }
+
+    ul.flashes {
+      margin-top: 15px;
+      padding: 0;
+      list-style: none;
+      color: red;
+    }
+
+    ul.flashes li {
+      margin-bottom: 5px;
+    }
+  </style>
+
+  <script>
+    // 郵便番号入力時に住所自動補完
+    function lookupAddress() {
+      var postal = $('#ShippingPostalCode').val().replace('-', '').trim();
+      if (postal.length !== 7 || isNaN(postal)) return;
+
+      $.getJSON('https://zipcloud.ibsnet.co.jp/api/search', { zipcode: postal }, function(data){
+        if (data.results) {
+          var res = data.results[0];
+          $('#ShippingState').val(res.address1);
+          $('#ShippingCity').val(res.address2);
+          $('#ShippingStreet').val(res.address3);
+        }
+      });
+    }
+
+    $(function(){
+      $('#ShippingPostalCode').on('change keyup', lookupAddress);
+
+      // Enterキーでフォーム送信を防止
+      $('form').on('keydown', function(e) {
+        if (e.key === "Enter" && e.target.tagName.toLowerCase() !== "textarea") {
+          e.preventDefault();
+        }
+      });
+
+      // 次回コール日と時間の初期値設定
+      var today = new Date();
+      var yyyy = today.getFullYear();
+      var mm = String(today.getMonth() + 1).padStart(2, '0');
+      var dd = String(today.getDate()).padStart(2, '0');
+      $('#Field59__c').val(`${yyyy}-${mm}-${dd}`);
+
+      var hh = String(today.getHours()).padStart(2, '0');
+      var mi = String(today.getMinutes()).padStart(2, '0');
+      $('#Field60__c').val(`${hh}:${mi}`);
+    });
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h2>取引先登録フォーム</h2>
+
+    <form method="post" action="{{ url_for('create_account') }}">
+      <!-- 基本情報 -->
+      <fieldset>
+        <legend>基本情報</legend>
+        <label>取引先名（電話番号）:
+          <input type="text" name="Name" required>
+        </label>
+        <label>電話番号2:
+          <input type="text" name="X2__c">
+        </label>
+        <label>取次種別:
+          <select name="Field72__c" required>
+            {% for option in picklists['Field72__c'] %}
+              <option value="{{ option }}">{{ option }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>商材管理:
+          <select name="Field70__c" required>
+            {% for p in products %}
+              <option value="{{ p['Id'] }}">{{ p['Name'] }} ({{ p['Field1__c'] }} / {{ p['Field2__c'] }})</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>固定申込:
+          <select name="Field28__c">
+            {% for option in picklists['Field28__c'] %}
+              <option value="{{ option }}">{{ option }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>受注メモ:
+          <textarea name="Field53__c"></textarea>
+        </label>
+      </fieldset>
+
+      <!-- 住所 -->
+      <fieldset>
+        <legend>住所</legend>
+        <label>郵便番号:
+          <input type="text" name="ShippingPostalCode" id="ShippingPostalCode">
+        </label>
+        <div class="flex-row">
+          <label>都道府県:
+            <input type="text" name="ShippingState" id="ShippingState">
+          </label>
+          <label>市区群:
+            <input type="text" name="ShippingCity" id="ShippingCity">
+          </label>
+        </div>
+        <label>町名・番地:
+          <input type="text" name="ShippingStreet" id="ShippingStreet">
+        </label>
+        <div class="flex-row">
+          <label>丁目:
+            <input type="text" name="Field10__c">
+          </label>
+          <label>番地:
+            <input type="text" name="Field11__c">
+          </label>
+          <label>号:
+            <input type="text" name="Field12__c">
+          </label>
+        </div>
+        <div class="flex-row">
+          <label>建物名:
+            <input type="text" name="Field13__c">
+          </label>
+          <label>部屋番号:
+            <input type="text" name="Field14__c">
+          </label>
+        </div>
+      </fieldset>
+
+      <!-- 利用状況 -->
+      <fieldset>
+        <legend>利用状況</legend>
+        <label>利用回線:
+          <select name="Field20__c">
+            {% for option in picklists['Field20__c'] %}
+              <option value="{{ option }}">{{ option }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <div class="flex-row">
+          <label>利用携帯Ⅰ:
+            <select name="Field22__c">
+              {% for option in picklists['Field22__c'] %}
+                <option value="{{ option }}">{{ option }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <label>携帯台数Ⅰ:
+            <select name="Field23__c">
+              {% for option in picklists['Field23__c'] %}
+                <option value="{{ option }}">{{ option }}</option>
+              {% endfor %}
+            </select>
+          </label>
+        </div>
+        <label>KDDI提供エリア判定:
+          <select name="Field36__c">
+            {% for option in picklists['Field36__c'] %}
+              <option value="{{ option }}">{{ option }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>KDDI提供判定（貼り付け）:
+          <textarea name="Field37__c"></textarea>
+        </label>
+        <label>MS光WEB判定結果:
+          <select name="Field112__c">
+            {% for option in picklists['Field112__c'] %}
+              <option value="{{ option }}">{{ option }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>NTT提供判定（貼り付け）:
+          <textarea name="Field35__c"></textarea>
+        </label>
+        <div class="flex-row">
+          <label>次回コール日:
+            <input type="date" name="Field59__c" id="Field59__c">
+          </label>
+          <label>次回コール時間:
+            <input type="time" name="Field60__c" id="Field60__c">
+          </label>
+        </div>
+      </fieldset>
+
+      <button type="submit">登録</button>
+    </form>
+
+    <a href="{{ url_for('menu') }}" class="menu-link">メニューへ戻る</a>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for msg in messages %}
+            <li>{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+  </div>
+</body>
+
+<script>
+  $(function(){
+    // 送信前に次回コール時間を JST に変換
+    $('form').on('submit', function() {
+      var timeInput = $('#Field60__c').val(); // "HH:MM"
+      if(timeInput) {
+        var parts = timeInput.split(':');
+        var date = new Date();
+        date.setHours(parseInt(parts[0],10));
+        date.setMinutes(parseInt(parts[1],10));
+        date.setSeconds(0);
+
+        // +9時間して JST に
+        date.setHours(date.getHours() + 9);
+
+        var hh = String(date.getHours()).padStart(2,'0');
+        var mm = String(date.getMinutes()).padStart(2,'0');
+
+        // JST 時間を再セット
+        $('#Field60__c').val(`${hh}:${mm}`);
+      }
+    });
+  });
+</script>
+
+
+</html>
