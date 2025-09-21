@@ -15,7 +15,7 @@
         /* テーブル全体 */
         .table {
             width: 100%;
-            table-layout: auto; /* 可変列幅 */
+            table-layout: auto;
         }
         .table thead th {
             background-color: #e9ecef;
@@ -39,7 +39,7 @@
 
         /* 前後確メモ、NG理由 */
         td.pre-wrap {
-            white-space: pre-wrap; /* 改行保持 */
+            white-space: pre-wrap;
             word-wrap: break-word;
             text-align: left;
         }
@@ -51,11 +51,11 @@
         }
 
         /* 検索フォーム */
-        .search-form .form-control {
-            width: 250px;
+        .search-form .form-control,
+        .search-form .form-select {
+            width: 200px;
         }
 
-        /* テーブルレスポンシブ */
         .table-responsive {
             overflow-x: auto;
         }
@@ -65,9 +65,18 @@
 <div class="container mt-5">
     <h2>自分の案件一覧</h2>
 
+    <!-- 検索フォーム -->
     <form class="row g-3 mb-3 search-form" method="get">
         <div class="col-auto">
             <input type="text" name="keyword" class="form-control" placeholder="取引先名検索" value="{{ keyword }}">
+        </div>
+        <div class="col-auto">
+            <select name="status" class="form-select">
+                <option value="">前確ステータス全て</option>
+                {% for opt in status_options %}
+                    <option value="{{ opt }}" {% if selected_status == opt %}selected{% endif %}>{{ opt }}</option>
+                {% endfor %}
+            </select>
         </div>
         <div class="col-auto">
             <button class="btn btn-primary">検索</button>
@@ -83,6 +92,7 @@
         {% endif %}
     {% endwith %}
 
+    <!-- 案件テーブル -->
     <div class="table-responsive">
         <table class="table table-striped table-bordered table-sm align-middle">
             <thead class="table-light">
