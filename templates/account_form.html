@@ -5,120 +5,127 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>取引先登録</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <style>
-    body {
-      font-family: 'Helvetica Neue', Arial, sans-serif;
-      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
-      display: flex;
-      justify-content: center;
-      padding: 40px 20px;
-      margin: 0;
-    }
+<style>
+  body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: #e6ebf2; /* 背景を淡い青灰色に */
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    margin: 0;
+  }
 
-    .container {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 800px;
-    }
+  .container {
+    background: #fdfdfd; /* 薄い白にグレー混ぜて柔らかく */
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    width: 100%;
+    max-width: 800px;
+  }
 
-    h2 {
-      color: #333;
-      text-align: center;
-      margin-bottom: 30px;
-    }
+  h2 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+  }
 
-    fieldset {
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
+  fieldset {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #f8f9fa; /* セクションごとに淡いグレー */
+  }
 
-    legend {
-      font-weight: bold;
-      padding: 0 10px;
-    }
+  legend {
+    font-weight: bold;
+    padding: 0 10px;
+    color: #34495e;
+  }
 
-    label {
-      display: block;
-      margin-bottom: 10px;
-      font-weight: 500;
-    }
+  label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: #2c3e50;
+  }
 
-    input[type="text"],
-    input[type="date"],
-    input[type="time"],
-    select,
-    textarea {
-      width: 100%;
-      padding: 8px 10px;
-      margin-top: 4px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
-      box-sizing: border-box;
-    }
+  input[type="text"],
+  input[type="date"],
+  input[type="time"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 8px 10px;
+    margin-top: 4px;
+    margin-bottom: 10px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+    background-color: #fff; /* 入力欄は白で読みやすく */
+  }
 
-    textarea {
-      min-height: 60px;
-      resize: vertical;
-    }
+  textarea {
+    min-height: 60px;
+    resize: vertical;
+  }
 
-    .flex-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+  .flex-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
 
-    .flex-row label {
-      flex: 1;
-    }
+  .flex-row label {
+    flex: 1;
+  }
 
-    button {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      background-color: #7aa0f8;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+  button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #5aa0f8;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
 
-    button:hover {
-      background-color: #5f86e0;
-    }
+  button:hover {
+    background-color: #4285d4;
+  }
 
-    a.menu-link {
-      display: block;
-      text-align: center;
-      margin-top: 20px;
-      color: #7aa0f8;
-      text-decoration: none;
-      font-weight: bold;
-    }
+  a.menu-link {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    color: #5aa0f8;
+    text-decoration: none;
+    font-weight: bold;
+  }
 
-    a.menu-link:hover {
-      color: #5f86e0;
-    }
+  a.menu-link:hover {
+    color: #4285d4;
+  }
 
-    ul.flashes {
-      margin-top: 15px;
-      padding: 0;
-      list-style: none;
-      color: red;
-    }
+  ul.flashes {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 6px;
+    list-style: none;
+    color: #c0392b;
+    background-color: #fcebea;
+  }
 
-    ul.flashes li {
-      margin-bottom: 5px;
-    }
-  </style>
+  ul.flashes li {
+    margin-bottom: 5px;
+  }
+</style>
+
 
   <script>
     // 郵便番号入力時に住所自動補完
@@ -168,24 +175,24 @@
       <fieldset>
         <legend>基本情報</legend>
         <label>取引先名（電話番号）:
-          <input type="text" name="Name" required pattern="[0-9]+"
-                 title="半角数字のみ入力してください">
+          <input type="text" name="Name" required>
         </label>
-        
         <label>電話番号2:
-          <input type="text" name="X2__c" pattern="[0-9]+"
-                 title="半角数字のみ入力してください">
+          <input type="text" name="X2__c">
         </label>
 
         <label>取次種別:
-          <select name="Field72__c" required>
+          <select name="Field72__c">
+            <option value=""></option> <!-- ここが空欄 -->
             {% for option in picklists['Field72__c'] %}
               <option value="{{ option }}">{{ option }}</option>
             {% endfor %}
           </select>
         </label>
+
         <label>商材管理:
           <select name="Field70__c" required>
+            <option value=""></option>
             {% for p in products %}
               <option value="{{ p['Id'] }}">{{ p['Name'] }} ({{ p['Field1__c'] }} / {{ p['Field2__c'] }})</option>
             {% endfor %}
@@ -193,13 +200,26 @@
         </label>
         <label>固定申込:
           <select name="Field28__c">
+            <option value=""></option>
             {% for option in picklists['Field28__c'] %}
               <option value="{{ option }}">{{ option }}</option>
             {% endfor %}
           </select>
         </label>
+        <label>リスト名:
+          <input type="text" name="Field52__c" required>
+        </label>
         <label>受注メモ:
-          <textarea name="Field53__c"></textarea>
+        <select id="memoTemplateSelect">
+          <option value="">選択してください</option>
+          {% for t in templates %}
+            <option value="{{ t['content'] }}">{{ t['name'] }}</option>
+          {% endfor %}
+        </select>
+        <button type="button" id="insertTemplateBtn">貼り付け</button>
+
+        <textarea name="Field53__c" rows="5"></textarea>
+
         </label>
       </fieldset>
 
@@ -207,7 +227,12 @@
       <fieldset>
         <legend>住所</legend>
         <label>郵便番号:
-          <input type="text" name="ShippingPostalCode" id="ShippingPostalCode">
+          <input type="text" 
+                name="ShippingPostalCode" 
+                id="ShippingPostalCode" 
+                maxlength="8" 
+                placeholder="例: 123-4567" 
+                oninput="this.value = this.value.replace(/[^0-9-]/g,'')">
         </label>
         <div class="flex-row">
           <label>都道府県:
@@ -246,6 +271,7 @@
         <legend>利用状況</legend>
         <label>利用回線:
           <select name="Field20__c">
+            <option value=""></option>
             {% for option in picklists['Field20__c'] %}
               <option value="{{ option }}">{{ option }}</option>
             {% endfor %}
@@ -254,6 +280,7 @@
         <div class="flex-row">
           <label>利用携帯Ⅰ:
             <select name="Field22__c">
+              <option value=""></option>
               {% for option in picklists['Field22__c'] %}
                 <option value="{{ option }}">{{ option }}</option>
               {% endfor %}
@@ -261,6 +288,7 @@
           </label>
           <label>携帯台数Ⅰ:
             <select name="Field23__c">
+              <option value=""></option>
               {% for option in picklists['Field23__c'] %}
                 <option value="{{ option }}">{{ option }}</option>
               {% endfor %}
@@ -269,6 +297,7 @@
         </div>
         <label>KDDI提供エリア判定:
           <select name="Field36__c">
+            <option value=""></option>
             {% for option in picklists['Field36__c'] %}
               <option value="{{ option }}">{{ option }}</option>
             {% endfor %}
@@ -279,6 +308,7 @@
         </label>
         <label>MS光WEB判定結果:
           <select name="Field112__c">
+            <option value=""></option>
             {% for option in picklists['Field112__c'] %}
               <option value="{{ option }}">{{ option }}</option>
             {% endfor %}
@@ -337,6 +367,15 @@
       }
     });
   });
+</script>
+<script>
+$('#insertTemplateBtn').on('click', function() {
+    var template = $('#memoTemplateSelect').val();
+    if(template) {
+        var $memo = $('textarea[name="Field53__c"]');
+        $memo.val(template + $memo.val()); // 先頭に挿入
+    }
+});
 </script>
 
 
