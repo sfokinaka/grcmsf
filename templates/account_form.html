@@ -168,11 +168,15 @@
       <fieldset>
         <legend>基本情報</legend>
         <label>取引先名（電話番号）:
-          <input type="text" name="Name" required>
+          <input type="text" name="Name" required pattern="[0-9]+"
+                 title="半角数字のみ入力してください">
         </label>
+        
         <label>電話番号2:
-          <input type="text" name="X2__c">
+          <input type="text" name="X2__c" pattern="[0-9]+"
+                 title="半角数字のみ入力してください">
         </label>
+
         <label>取次種別:
           <select name="Field72__c" required>
             {% for option in picklists['Field72__c'] %}
