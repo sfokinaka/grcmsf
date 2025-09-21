@@ -52,6 +52,24 @@
       background-color: #5f86e0;
     }
 
+    /* 目立たないボタン（取次可能商材一覧用） */
+    .secondary-button {
+      display: block;
+      margin: 15px auto;
+      padding: 12px 20px;
+      width: 80%;
+      text-decoration: none;
+      background-color: #b0b0b0; /* 淡めのグレー */
+      color: white;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    .secondary-button:hover {
+      background-color: #8f8f8f;
+    }
+
     .logout-button {
       display: block;
       margin: 30px auto 0 auto;
@@ -75,9 +93,9 @@
     <h2>ようこそ {{ username }} さん</h2>
     <p>所属販社: {{ company }}</p>
 
-    <a href="{{ url_for('products') }}" class="menu-button">取次可能商材一覧</a>
     <a href="{{ url_for('new_account') }}" class="menu-button">取引先登録フォーム</a>
     <a href="{{ url_for('my_accounts') }}" class="menu-button">自分の案件一覧</a>
+    <a href="{{ url_for('products') }}" class="secondary-button">取次可能商材一覧</a>
     <a href="{{ url_for('logout') }}" class="logout-button">ログアウト</a>
   </div>
 </body>
