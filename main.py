@@ -252,6 +252,30 @@ def create_account():
         )
 
 
+# -----------------------------
+# セッション有効期限チェック
+# -----------------------------
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(hours=1)
+
+    last_activity = session.get("last_activity")
+    if last_activity:
+        last_time = datetime.fromisoformat(last_activity)
+        if datetime.now(JST) - last_time > timedelta(hours=1):
+            session.clear()
+            flash("1時間無操作のため、再ログインしてください")
+            return redirect(url_for("login"))
+
+    session["last_activity"] = datetime.now(JST).isoformat()
+
+
+@app.route("/")
+def index():
+    return redirect(url_for("login"))
+
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Render が割り当てたポートを取得
