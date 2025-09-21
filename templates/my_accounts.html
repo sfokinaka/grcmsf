@@ -4,18 +4,13 @@
     <meta charset="UTF-8">
     <title>自分の案件一覧</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <style>
         body {
             background-color: #f8f9fa;
         }
         h2 {
             margin-bottom: 30px;
-        }
-
-        /* テーブル全体 */
-        .table {
-            width: 100%;
-            table-layout: auto;
         }
         .table thead th {
             background-color: #e9ecef;
@@ -26,39 +21,17 @@
             vertical-align: middle;
             text-align: center;
         }
-
-        /* 固定幅列 */
-        th.fixed, td.fixed {
-            min-width: 100px;
-            white-space: nowrap;
-        }
-        th.fixed-long, td.fixed-long {
-            min-width: 150px;
-            white-space: nowrap;
-        }
-
-        /* 前後確メモ、NG理由 */
+        th.fixed, td.fixed { min-width: 100px; white-space: nowrap; }
+        th.fixed-long, td.fixed-long { min-width: 150px; white-space: nowrap; }
         td.pre-wrap {
-            white-space: pre-wrap;
-            word-wrap: break-word;
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             text-align: left;
         }
-
-        /* ボタン */
-        .btn-warning {
-            font-size: 0.85rem;
-            padding: 0.25rem 0.5rem;
-        }
-
-        /* 検索フォーム */
-        .search-form .form-control,
-        .search-form .form-select {
-            width: 200px;
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-        }
+        .btn-warning { font-size: 0.85rem; padding: 0.25rem 0.5rem; }
+        .search-form .form-control, .search-form .form-select { width: 200px; }
     </style>
 </head>
 <body>
@@ -84,6 +57,8 @@
         </div>
     </form>
 
+    
+
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             <div class="alert alert-success">
@@ -93,56 +68,109 @@
     {% endwith %}
 
     <!-- 案件テーブル -->
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered table-sm align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th class="fixed-long">取引先名</th>
-                    <th class="fixed">商材</th>
-                    <th class="fixed">次回コール日</th>
-                    <th class="fixed">次回コール時間</th>
-                    <th class="fixed">前確ステータス</th>
-                    <th class="fixed">作成日時</th>
-                    <th class="fixed">前確OK日</th>
-                    <th class="fixed">申込日</th>
-                    <th>前後確メモ</th>
-                    <th>NG理由</th>
-                    <th class="fixed">操作</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for acc in accounts %}
-                <tr>
-                    <td class="fixed-long">{{ acc['Name'] or '' }}</td>
-                    <td class="fixed">{{ acc.get('Field70__r', {}).get('Name', '') }}</td>
-                    <td class="fixed">{{ acc['Field59__c'] or '' }}</td>
-                    <td class="fixed">
-                        {% if acc['Field60__c'] %}
-                            {{ acc['Field60__c'][:5] }}
-                        {% else %}
-                            &nbsp;
-                        {% endif %}
-                    </td>
-                    <td class="fixed">{{ acc['Field54__c'] or '' }}</td>
-                    <td class="fixed">{{ acc['CreatedDate'][:10] if acc['CreatedDate'] else '' }}</td>
-                    <td class="fixed">{{ acc['Field131__c'] or '' }}</td>
-                    <td class="fixed">{{ acc['Field90__c'] or '' }}</td>
-                    <td class="pre-wrap">{{ acc['Field65__c'] or '' }}</td>
-                    <td class="pre-wrap">{{ acc['Field57__c'] or '' }}</td>
-                    <td class="fixed">
-                        {% if not acc['Field90__c'] %}
-                            <a href="{{ url_for('edit_account', account_id=acc['Id']) }}" class="btn btn-sm btn-warning">編集</a>
-                        {% else %}
-                            &nbsp;
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <table id="accounts-table" class="table table-striped table-bordered table-sm align-middle">
+        <thead class="table-light">
+            <tr>
+                <th class="fixed-long">取引先名</th>
+                <th class="fixed">商材</th>
+                <th class="fixed">次回コール日</th>
+                <th class="fixed">次回コール時間</th>
+                <th class="fixed">前確ステータス</th>
+                <th class="fixed">作成日時</th>
+                <th class="fixed">前確OK日</th>
+                <th class="fixed">申込日</th>
+                <th>前後確メモ</th>
+                <th>NG理由</th>
+                <th class="fixed">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for acc in accounts %}
+            <tr>
+                <td class="fixed-long">{{ acc['Name'] or '' }}</td>
+                <td class="fixed">{{ acc.get('Field70__r', {}).get('Name', '') }}</td>
+                <td class="fixed">{{ acc['Field59__c'] or '' }}</td>
+                <td class="fixed">{{ acc['Field60__c'][:5] if acc['Field60__c'] else '' }}</td>
+                <td class="fixed">{{ acc['Field54__c'] or '' }}</td>
+                <td class="fixed">{{ acc['CreatedDate'][:10] if acc['CreatedDate'] else '' }}</td>
+                <td class="fixed">{{ acc['Field131__c'] or '' }}</td>
+                <td class="fixed">{{ acc['Field90__c'] or '' }}</td>
+                <td class="pre-wrap"
+                    data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true"
+                    title="{{ (acc['Field65__c'] or '').replace('\n','<br>') }}">
+                    {{ acc['Field65__c'] or '' }}
+                </td>
+                <td class="pre-wrap"
+                    data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true"
+                    title="{{ (acc['Field57__c'] or '').replace('\n','<br>') }}">
+                    {{ acc['Field57__c'] or '' }}
+                </td>
+                <td class="fixed">
+                    {% if not acc['Field131__c'] %}
+                        <a href="{{ url_for('edit_account', account_id=acc['Id']) }}" class="btn btn-sm btn-warning">編集</a>
+                    {% else %}
+                        &nbsp;
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
     <a href="{{ url_for('menu') }}" class="btn btn-secondary mt-3">メニューに戻る</a>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('#accounts-table').DataTable({
+        "order": [[5, "desc"]], // 作成日時を新しい順
+        "pageLength": 25,
+        "lengthMenu": [10, 25, 50, 100],
+        "columnDefs": [
+            { "orderable": false, "targets": [8, 9, 10] } // メモ、NG理由、操作列はソート不可
+        ],
+        "autoWidth": true,
+        "scrollX": false,
+        "language": {
+            "decimal": "",
+            "emptyTable": "テーブルにデータがありません",
+            "info": "_TOTAL_ 件中 _START_ から _END_ を表示",
+            "infoEmpty": "0 件中 0 から 0 を表示",
+            "infoFiltered": "（全 _MAX_ 件より抽出）",
+            "infoPostFix": "",
+            "thousands": ",",
+            "lengthMenu": "_MENU_ 件表示",
+            "loadingRecords": "読み込み中...",
+            "processing": "処理中...",
+            "search": "検索（すべて）:",
+            "zeroRecords": "一致するレコードがありません",
+            "paginate": {
+                "first": "先頭",
+                "last": "最終",
+                "next": "次",
+                "previous": "前"
+            },
+            "aria": {
+                "sortAscending": ": 昇順に並べ替え",
+                "sortDescending": ": 降順に並べ替え"
+            }
+        }
+    });
+
+    // Bootstrapツールチップ初期化
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+});
+</script>
+
+
+
 </body>
 </html>
