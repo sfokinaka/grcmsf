@@ -253,6 +253,105 @@ def create_account():
 
 
 # -----------------------------
+# 自分の案件一覧
+# -----------------------------
+@app.route("/my_accounts")
+def my_accounts():
+    user = session.get("user")
+    if not user:
+        flash("ログインしてください")
+        return redirect(url_for("login"))
+
+    keyword = request.args.get("keyword", "")
+
+    soql = f"""
+        SELECT Id, Name, Field70__c,  Field70__r.Name, Field59__c, Field60__c, Field54__c,
+               CreatedDate, Field131__c, Field90__c, Field65__c, Field57__c
+        FROM Account
+        WHERE Field71__c = '{user["id"]}'
+    """
+    if keyword:
+        soql += f" AND Name LIKE '%{keyword}%'"
+
+    result = sf.query(soql)
+    accounts = result.get("records", [])
+    return render_template("my_accounts.html", accounts=accounts, keyword=keyword)
+
+
+@app.route("/account/edit/<account_id>")
+def edit_account(account_id):
+    soql = f"""
+        SELECT Id, Name, Field70__c, Field70__r.Name, Field59__c, Field60__c, Field54__c, Description
+        FROM Account
+        WHERE Id = '{account_id}'
+    """
+    result = sf.query(soql)
+    if not result['records']:
+        flash("案件が見つかりません")
+        return redirect(url_for("my_accounts"))
+
+    account = result['records'][0]
+
+    # ピックリスト取得
+    field_desc = sf.Account.describe()["fields"]
+    picklists = {}
+    for f in field_desc:
+        if f["name"] in ["Field54__c"]:
+            picklists[f["name"]] = [p["value"] for p in f.get("picklistValues", []) if not p.get("inactive", False)]
+
+    return render_template("edit_account.html", account=account, picklists=picklists)
+
+
+
+@app.route("/account/update/<account_id>", methods=["POST"])
+def update_account(account_id):
+    user = session.get("user")
+    if not user:
+        flash("ログインしてください")
+        return redirect(url_for("login"))
+    
+    # フォームから時間取得（HH:MM形式）
+    time_str = request.form.get("Field60__c")  # ex: "08:30"
+    if time_str:
+        # datetime オブジェクトに変換（秒は 0 にする）
+        dt = datetime.strptime(time_str, "%H:%M")
+        dt = dt.replace(second=0)
+        # JST → UTC に変換
+        dt_utc = dt - timedelta(hours=0)
+        # Salesforce Time 型用の文字列に変換
+        field60_value = dt_utc.strftime("%H:%M:%S.000Z")
+    else:
+        # 空欄の場合は 00:00:00
+        field60_value = "00:00:00.000Z"
+
+    update_data = {
+        "Field59__c": request.form.get("Field59__c"),
+        "Field60__c": field60_value,
+        "Field54__c": request.form.get("Field54__c"),
+    }
+    call_result = request.form.get("call_result")
+
+    # 案件更新
+    sf.Account.update(account_id, update_data)
+
+    # 活動記録(Task作成)
+    sf.Task.create({
+        "Subject": "電話",
+        "OwnerId": "005GA00000AbMOaYAN",
+        "ActivityDate": datetime.now(JST).date().isoformat(),
+        "WhatId": account_id,         # 関連先
+        "Status": "Completed",
+        "Field1__c": "架電",
+        "Field2__c": "営業架電",
+        "Field3__c": call_result,
+        "Description": request.form.get("Description")
+    })
+
+    flash("案件を更新し、活動記録を作成しました")
+    return redirect(url_for("my_accounts"))
+
+
+# -----------------------------
 # セッション有効期限チェック
 # -----------------------------
 @app.before_request
