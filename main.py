@@ -99,7 +99,6 @@ def logout():
     return redirect(url_for("login"))
 
 # -----------------------------
-
 # 取次可能商材
 # -----------------------------
 @app.route("/products")
@@ -130,8 +129,9 @@ def new_account():
         flash("ログインしてください")
         return redirect(url_for("login"))
 
-    # 取次可能商材を取得
     company = user["company"]
+
+    # 取次可能商材を取得
     soql = f"""
         SELECT Id, Name, Field1__c, Field2__c
         FROM CustomObject3__c
@@ -142,8 +142,6 @@ def new_account():
 
     # Salesforce picklist 取得用
     field_desc = sf.Account.describe()["fields"]
-
-    # 選択リストをまとめて取得
     picklists = {}
     picklist_fields = [
         "Field72__c",  # 取次種別
@@ -155,18 +153,25 @@ def new_account():
         "Field36__c",  # KDDI提供エリア判定
         "Field112__c"  # MS光WEB判定結果
     ]
-
     for f in field_desc:
         if f["name"] in picklist_fields:
             picklists[f["name"]] = [p["value"] for p in f.get("picklistValues", []) if not p.get("inactive", False)]
 
+    # ==============================
+    # 自分の販社用テンプレを取得
+    # ==============================
+    templates_raw = sf.query_all(
+        f"SELECT Name, Field1__c, Field2__c FROM CustomObject5__c WHERE Field2__c = '{company}'"
+    )["records"]
+    templates = [{"name": t["Name"], "content": t["Field1__c"]} for t in templates_raw]
+
     return render_template(
         "account_form.html",
         products=products,
-        picklists=picklists,  # まとめて渡す
+        picklists=picklists,
+        templates=templates,  # ← ここで渡す
         user=user
     )
-
 
 # -----------------------------
 # 取引先レコード作成送信
