@@ -263,20 +263,36 @@ def my_accounts():
         return redirect(url_for("login"))
 
     keyword = request.args.get("keyword", "")
+    selected_status = request.args.get("status", "")
 
     soql = f"""
-        SELECT Id, Name, Field70__c,  Field70__r.Name, Field59__c, Field60__c, Field54__c,
+        SELECT Id, Name, Field70__c, Field70__r.Name, Field59__c, Field60__c, Field54__c,
                CreatedDate, Field131__c, Field90__c, Field65__c, Field57__c
         FROM Account
         WHERE Field71__c = '{user["id"]}'
     """
     if keyword:
         soql += f" AND Name LIKE '%{keyword}%'"
+    if selected_status:
+        soql += f" AND Field54__c = '{selected_status}'"
 
     result = sf.query(soql)
     accounts = result.get("records", [])
-    return render_template("my_accounts.html", accounts=accounts, keyword=keyword)
 
+    # 前確ステータスの選択肢を取得
+    picklists = sf.Account.describe()["fields"]
+    status_options = []
+    for f in picklists:
+        if f["name"] == "Field54__c":
+            status_options = [p["value"] for p in f.get("picklistValues", []) if not p.get("inactive", False)]
+
+    return render_template(
+        "my_accounts.html",
+        accounts=accounts,
+        keyword=keyword,
+        status_options=status_options,
+        selected_status=selected_status
+    )
 
 @app.route("/account/edit/<account_id>")
 def edit_account(account_id):
