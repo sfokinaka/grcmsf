@@ -77,7 +77,7 @@
         <th>商材</th>
         <th>商流</th>
       </tr>
-      {% for p in products %}
+      {% for p in products|sort(attribute="Name") %}
       <tr>
         <td>{{ p["Name"] }}</td>
         <td>{{ p["Field1__c"] }}</td>
