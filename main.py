@@ -192,7 +192,7 @@ def create_account():
         "Field52__c": request.form.get("Field52__c"),
         "Field59__c": request.form.get("Field59__c"),
         "Field60__c": request.form.get("Field60__c"),
-        "Field60__c": request.form.get("Field162__c"),
+        "Field162__c": request.form.get("Field162__c"),
         "Field53__c": request.form.get("Field53__c"),
         "Field1__c": request.form.get("Field1__c"),
         "Field2__c": request.form.get("Field2__c"),
