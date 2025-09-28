@@ -317,6 +317,14 @@
         <label>NTT提供判定（貼り付け）:
           <textarea name="Field35__c"></textarea>
         </label>
+        <label>前確希望:
+          <select name="Field162__c">
+            <option value=""></option>
+            {% for option in picklists['Field162__c'] %}
+              <option value="{{ option }}">{{ option }}</option>
+            {% endfor %}
+          </select>
+        </label>
         <div class="flex-row">
           <label>次回コール日:
             <input type="date" name="Field59__c" id="Field59__c">
