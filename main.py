@@ -151,7 +151,8 @@ def new_account():
         "Field22__c",  # 利用携帯Ⅰ
         "Field23__c",  # 携帯台数Ⅰ
         "Field36__c",  # KDDI提供エリア判定
-        "Field112__c"  # MS光WEB判定結果
+        "Field112__c",  # MS光WEB判定結果
+        "Field162__c"  # 前確希望
     ]
     for f in field_desc:
         if f["name"] in picklist_fields:
